@@ -3,10 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>IoT Lighting Control</title>
+
     <link rel="stylesheet"
           href="{{ url_for('static', filename='style.css') }}">
 </head>
+
 <body>
     <header>
         <h1>Интеллектуальная система управления освещением</h1>
@@ -17,24 +20,48 @@
         <section class="cards">
             <div class="card">
                 <h2>Напряжение</h2>
-                <p class="value">220 В</p>
+                <p class="value">
+                    <span id="voltage">—</span> В
+                </p>
             </div>
 
             <div class="card">
                 <h2>Ток</h2>
-                <p class="value">3.2 А</p>
+                <p class="value">
+                    <span id="current">—</span> А
+                </p>
             </div>
 
             <div class="card">
                 <h2>Мощность</h2>
-                <p class="value">704 Вт</p>
+                <p class="value">
+                    <span id="power">—</span> Вт
+                </p>
             </div>
 
             <div class="card">
                 <h2>Состояние</h2>
-                <p class="value status">Освещение включено</p>
+                <p id="status" class="value status">
+                    Получение данных...
+                </p>
+            </div>
+        </section>
+
+        <section class="control-panel">
+            <h2>Управление освещением</h2>
+
+            <div class="buttons">
+                <button class="button-on" onclick="turnLight('on')">
+                    Включить
+                </button>
+
+                <button class="button-off" onclick="turnLight('off')">
+                    Выключить
+                </button>
             </div>
         </section>
     </main>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

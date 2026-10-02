@@ -61,3 +61,55 @@ main {
     color: #16a34a;
     font-size: 21px;
 }
+.control-panel {
+    margin-top: 30px;
+    padding: 25px;
+    text-align: center;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.1);
+}
+
+.control-panel h2 {
+    margin-top: 0;
+}
+
+.buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.buttons button {
+    min-width: 150px;
+    padding: 13px 25px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.buttons button:hover {
+    transform: translateY(-2px);
+    opacity: 0.9;
+}
+
+.button-on {
+    background: #16a34a;
+}
+
+.button-off {
+    background: #dc2626;
+}
+
+.status-on {
+    color: #16a34a;
+}
+
+.status-off {
+    color: #dc2626;
+}
