@@ -113,3 +113,32 @@ main {
 .status-off {
     color: #dc2626;
 }
+.chart-panel {
+    margin-top: 30px;
+    padding: 25px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.1);
+}
+
+.chart-panel h2 {
+    margin: 0 0 5px;
+    text-align: center;
+}
+
+.chart-panel p {
+    margin: 0 0 20px;
+    text-align: center;
+    color: #64748b;
+}
+
+#powerChart {
+    display: block;
+    width: 100%;
+    max-width: 900px;
+    height: 320px;
+    margin: 0 auto;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+}
