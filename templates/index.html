@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IoT Lighting Control</title>
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Интеллектуальная система управления освещением</h1>
+        <p>Мониторинг городской системы освещения на основе IoT</p>
+    </header>
+
+    <main>
+        <section class="cards">
+            <div class="card">
+                <h2>Напряжение</h2>
+                <p class="value">220 В</p>
+            </div>
+
+            <div class="card">
+                <h2>Ток</h2>
+                <p class="value">3.2 А</p>
+            </div>
+
+            <div class="card">
+                <h2>Мощность</h2>
+                <p class="value">704 Вт</p>
+            </div>
+
+            <div class="card">
+                <h2>Состояние</h2>
+                <p class="value status">Освещение включено</p>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

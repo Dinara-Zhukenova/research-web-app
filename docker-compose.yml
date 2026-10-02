@@ -1,0 +1,9 @@
+services:
+  web:
+    build: .
+    container_name: research-web-app
+    ports:
+      - "5000:5000"
+    volumes:
+      - .:/app
+    restart: unless-stopped
