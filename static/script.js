@@ -11,7 +11,42 @@ async function loadHistory() {
         history.forEach((measurement) => {
             powerHistory.push(measurement.power);
         });
+async function loadComparison() {
+    try {
+        const response = await fetch("/api/comparison");
+        const data = await response.json();
 
+        document.getElementById(
+            "conventionalAverage"
+        ).textContent =
+            data.conventional.average_power;
+
+        document.getElementById(
+            "conventionalCount"
+        ).textContent =
+            data.conventional.sample_count;
+
+        document.getElementById(
+            "adaptiveAverage"
+        ).textContent =
+            data.adaptive.average_power;
+
+        document.getElementById(
+            "adaptiveCount"
+        ).textContent =
+            data.adaptive.sample_count;
+
+        document.getElementById(
+            "comparisonSavings"
+        ).textContent =
+            data.savings_percent;
+    } catch (error) {
+        console.error(
+            "Не удалось загрузить сравнение",
+            error
+        );
+    }
+}
         drawPowerChart();
     } catch (error) {
         console.error("Не удалось загрузить историю", error);
@@ -263,5 +298,7 @@ function drawPowerChart() {
 
 
 loadHistory();
+loadComparison();
 
 setInterval(updateData, 2000);
+setInterval(loadComparison, 5000);

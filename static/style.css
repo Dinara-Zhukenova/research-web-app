@@ -248,3 +248,52 @@ tbody tr:hover {
 .export-button:hover {
     background: #115e59;
 }
+.comparison-panel {
+    margin-top: 30px;
+    padding: 25px;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.1);
+}
+
+.comparison-panel h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.comparison-grid {
+    display: grid;
+    grid-template-columns: repeat(
+        auto-fit,
+        minmax(220px, 1fr)
+    );
+    gap: 18px;
+}
+
+.comparison-card {
+    padding: 20px;
+    text-align: center;
+    background: #f8fafc;
+    border: 2px solid #64748b;
+    border-radius: 10px;
+}
+
+.comparison-card h3 {
+    margin-top: 0;
+}
+
+.adaptive-card {
+    border-color: #7c3aed;
+    background: #f5f3ff;
+}
+
+.savings-card {
+    border-color: #16a34a;
+    background: #f0fdf4;
+}
+
+.saving-value {
+    margin: 15px 0 0;
+    color: #16a34a;
+    font-size: 32px;
+}

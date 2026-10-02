@@ -125,7 +125,48 @@
         Скачать CSV
     </a>
 </section>
-        <section class="events-panel">
+        <section class="comparison-panel">
+    <h2>Сравнение режимов управления</h2>
+
+    <div class="comparison-grid">
+        <div class="comparison-card">
+            <h3>Таймер / фотореле</h3>
+
+            <p>
+                Средняя мощность:
+                <strong id="conventionalAverage">—</strong> Вт
+            </p>
+
+            <p>
+                Измерений:
+                <strong id="conventionalCount">0</strong>
+            </p>
+        </div>
+
+        <div class="comparison-card adaptive-card">
+            <h3>Адаптивный IoT</h3>
+
+            <p>
+                Средняя мощность:
+                <strong id="adaptiveAverage">—</strong> Вт
+            </p>
+
+            <p>
+                Измерений:
+                <strong id="adaptiveCount">0</strong>
+            </p>
+        </div>
+
+        <div class="comparison-card savings-card">
+            <h3>Экономия энергии</h3>
+
+            <p class="saving-value">
+                <strong id="comparisonSavings">0</strong> %
+            </p>
+        </div>
+    </div>
+</section>
+<section class="events-panel">
             <h2>Журнал событий</h2>
 
             <div class="table-container">
