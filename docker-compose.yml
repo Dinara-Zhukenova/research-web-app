@@ -6,4 +6,18 @@ services:
       - "5000:5000"
     volumes:
       - .:/app
+    environment:
+      MQTT_HOST: mqtt
+      MQTT_PORT: 1883
+    restart: unless-stopped
+    depends_on:
+      - mqtt
+
+  mqtt:
+    image: eclipse-mosquitto:2
+    container_name: research-mqtt
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
     restart: unless-stopped
