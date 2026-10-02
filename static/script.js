@@ -1,4 +1,6 @@
 const powerHistory = [];
+
+
 async function loadHistory() {
     try {
         const response = await fetch("/api/history");
@@ -18,16 +20,26 @@ async function loadHistory() {
     await updateData();
 }
 
+
 async function updateData() {
     try {
         const response = await fetch("/api/data");
         const data = await response.json();
 
-        document.getElementById("voltage").textContent = data.voltage;
-        document.getElementById("current").textContent = data.current;
-        document.getElementById("power").textContent = data.power;
+        document.getElementById("voltage").textContent =
+            data.voltage;
+
+        document.getElementById("current").textContent =
+            data.current;
+
+        document.getElementById("power").textContent =
+            data.power;
+
+        document.getElementById("savings").textContent =
+            data.savings;
 
         const status = document.getElementById("status");
+        const mode = document.getElementById("controlMode");
 
         if (data.lighting_on) {
             status.textContent = "Освещение включено";
@@ -35,6 +47,14 @@ async function updateData() {
         } else {
             status.textContent = "Освещение выключено";
             status.className = "value status status-off";
+        }
+
+        if (data.control_mode === "adaptive") {
+            mode.textContent = "Адаптивный IoT";
+            mode.className = "mode-adaptive";
+        } else {
+            mode.textContent = "Таймер / фотореле";
+            mode.className = "mode-conventional";
         }
 
         powerHistory.push(data.power);
@@ -57,10 +77,104 @@ async function turnLight(action) {
             method: "POST"
         });
 
-        await updateData();
         addEvent(action);
+        await updateData();
     } catch (error) {
         alert("Не удалось выполнить команду");
+    }
+}
+
+
+async function changeMode(mode) {
+    try {
+        const response = await fetch(`/api/mode/${mode}`, {
+            method: "POST"
+        });
+
+        if (!response.ok) {
+            throw new Error("Ошибка изменения режима");
+        }
+
+        if (mode === "adaptive") {
+            addModeEvent(
+                "Адаптивный IoT-режим",
+                "Включён"
+            );
+        } else {
+            addModeEvent(
+                "Таймер / фотореле",
+                "Включён"
+            );
+        }
+
+        await updateData();
+    } catch (error) {
+        alert("Не удалось изменить режим");
+    }
+}
+
+
+function addEvent(action) {
+    const eventLog = document.getElementById("eventLog");
+    const time = new Date().toLocaleTimeString("ru-RU");
+
+    removeInitialRow(eventLog);
+
+    const row = document.createElement("tr");
+
+    if (action === "on") {
+        row.innerHTML = `
+            <td>${time}</td>
+            <td>Команда включения</td>
+            <td class="event-on">Включено</td>
+        `;
+    } else {
+        row.innerHTML = `
+            <td>${time}</td>
+            <td>Команда выключения</td>
+            <td class="event-off">Выключено</td>
+        `;
+    }
+
+    eventLog.prepend(row);
+    limitEventRows(eventLog);
+}
+
+
+function addModeEvent(eventName, state) {
+    const eventLog = document.getElementById("eventLog");
+    const time = new Date().toLocaleTimeString("ru-RU");
+
+    removeInitialRow(eventLog);
+
+    const row = document.createElement("tr");
+
+    row.innerHTML = `
+        <td>${time}</td>
+        <td>${eventName}</td>
+        <td class="event-on">${state}</td>
+    `;
+
+    eventLog.prepend(row);
+    limitEventRows(eventLog);
+}
+
+
+function removeInitialRow(eventLog) {
+    const initialRow = eventLog.querySelector("tr");
+
+    if (
+        initialRow &&
+        initialRow.textContent.includes("Система запущена")
+    ) {
+        initialRow.remove();
+    }
+}
+
+
+function limitEventRows(eventLog) {
+    while (eventLog.rows.length > 10) {
+        eventLog.deleteRow(10);
     }
 }
 
@@ -81,8 +195,11 @@ function drawPowerChart() {
     const paddingTop = 25;
     const paddingBottom = 45;
 
-    const graphWidth = width - paddingLeft - paddingRight;
-    const graphHeight = height - paddingTop - paddingBottom;
+    const graphWidth =
+        width - paddingLeft - paddingRight;
+
+    const graphHeight =
+        height - paddingTop - paddingBottom;
 
     const maximumPower = 1000;
 
@@ -136,6 +253,7 @@ function drawPowerChart() {
     context.stroke();
 
     context.fillStyle = "#475569";
+
     context.fillText(
         "Последние показания мощности",
         paddingLeft,
@@ -143,41 +261,7 @@ function drawPowerChart() {
     );
 }
 
-function addEvent(action) {
-    const eventLog = document.getElementById("eventLog");
-    const time = new Date().toLocaleTimeString("ru-RU");
 
-    const initialRow = eventLog.querySelector("tr");
-
-    if (
-        initialRow &&
-        initialRow.textContent.includes("Система запущена")
-    ) {
-        initialRow.remove();
-    }
-
-    const row = document.createElement("tr");
-
-    if (action === "on") {
-        row.innerHTML = `
-            <td>${time}</td>
-            <td>Команда включения</td>
-            <td class="event-on">Включено</td>
-        `;
-    } else {
-        row.innerHTML = `
-            <td>${time}</td>
-            <td>Команда выключения</td>
-            <td class="event-off">Выключено</td>
-        `;
-    }
-
-    eventLog.prepend(row);
-
-    while (eventLog.rows.length > 10) {
-        eventLog.deleteRow(10);
-    }
-}
 loadHistory();
 
 setInterval(updateData, 2000);

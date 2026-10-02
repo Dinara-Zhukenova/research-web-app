@@ -2,24 +2,36 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>IoT Lighting Control</title>
 
-    <link rel="stylesheet"
-          href="{{ url_for('static', filename='style.css') }}">
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}"
+    >
 </head>
 
 <body>
     <header>
-        <h1>Интеллектуальная система управления освещением</h1>
-        <p>Мониторинг городской системы освещения на основе IoT</p>
+        <h1>
+            Интеллектуальная система управления освещением
+        </h1>
+
+        <p>
+            Мониторинг городской системы освещения на основе IoT
+        </p>
     </header>
 
     <main>
         <section class="cards">
             <div class="card">
                 <h2>Напряжение</h2>
+
                 <p class="value">
                     <span id="voltage">—</span> В
                 </p>
@@ -27,6 +39,7 @@
 
             <div class="card">
                 <h2>Ток</h2>
+
                 <p class="value">
                     <span id="current">—</span> А
                 </p>
@@ -34,6 +47,7 @@
 
             <div class="card">
                 <h2>Мощность</h2>
+
                 <p class="value">
                     <span id="power">—</span> Вт
                 </p>
@@ -41,6 +55,7 @@
 
             <div class="card">
                 <h2>Состояние</h2>
+
                 <p id="status" class="value status">
                     Получение данных...
                 </p>
@@ -51,46 +66,93 @@
             <h2>Управление освещением</h2>
 
             <div class="buttons">
-                <button class="button-on" onclick="turnLight('on')">
+                <button
+                    class="button-on"
+                    onclick="turnLight('on')"
+                >
                     Включить
                 </button>
 
-                <button class="button-off" onclick="turnLight('off')">
+                <button
+                    class="button-off"
+                    onclick="turnLight('off')"
+                >
                     Выключить
                 </button>
             </div>
         </section>
+
+        <section class="mode-panel">
+            <h2>Режим управления</h2>
+
+            <p>
+                Текущий режим:
+                <strong id="controlMode">Обычный</strong>
+            </p>
+
+            <p>
+                Расчётная экономия:
+                <strong id="savings">0</strong> %
+            </p>
+
+            <div class="buttons">
+                <button
+                    class="button-conventional"
+                    onclick="changeMode('conventional')"
+                >
+                    Таймер / фотореле
+                </button>
+
+                <button
+                    class="button-adaptive"
+                    onclick="changeMode('adaptive')"
+                >
+                    Адаптивный IoT
+                </button>
+            </div>
+        </section>
+
         <section class="events-panel">
-    <h2>Журнал событий</h2>
+            <h2>Журнал событий</h2>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Время</th>
-                    <th>Событие</th>
-                    <th>Состояние</th>
-                </tr>
-            </thead>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Время</th>
+                            <th>Событие</th>
+                            <th>Состояние</th>
+                        </tr>
+                    </thead>
 
-            <tbody id="eventLog">
-                <tr>
-                    <td>—</td>
-                    <td>Система запущена</td>
-                    <td>Ожидание данных</td>
-                </tr>
-            </tbody>
-        </table>
-    </div>
-</section>
-    <section class="chart-panel">
-    <h2>Изменение мощности</h2>
-    <p>Имитация показаний в реальном времени</p>
+                    <tbody id="eventLog">
+                        <tr>
+                            <td>—</td>
+                            <td>Система запущена</td>
+                            <td>Ожидание данных</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
 
-    <canvas id="powerChart" width="900" height="320"></canvas>
-</section>
-</main>
+        <section class="chart-panel">
+            <h2>Изменение мощности</h2>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+            <p>
+                Имитация показаний в реальном времени
+            </p>
+
+            <canvas
+                id="powerChart"
+                width="900"
+                height="320"
+            ></canvas>
+        </section>
+    </main>
+
+    <script
+        src="{{ url_for('static', filename='script.js') }}"
+    ></script>
 </body>
 </html>

@@ -189,3 +189,32 @@ tbody tr:hover {
     color: #dc2626;
     font-weight: bold;
 }
+.mode-panel {
+    margin-top: 30px;
+    padding: 25px;
+    text-align: center;
+    background: white;
+    border-radius: 14px;
+    box-shadow: 0 5px 18px rgba(15, 23, 42, 0.1);
+}
+
+.button-conventional {
+    background: #475569;
+}
+
+.button-adaptive {
+    background: #7c3aed;
+}
+
+.mode-conventional {
+    color: #475569;
+}
+
+.mode-adaptive {
+    color: #7c3aed;
+}
+
+#savings {
+    color: #16a34a;
+    font-size: 20px;
+}
