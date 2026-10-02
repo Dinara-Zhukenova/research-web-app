@@ -21,3 +21,13 @@ services:
     volumes:
       - ./mosquitto/config/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
     restart: unless-stopped
+
+  sensor:
+    build: .
+    container_name: research-sensor
+    command: python sensor_simulator.py
+    volumes:
+      - .:/app
+    restart: unless-stopped
+    depends_on:
+      - mqtt
