@@ -1,8 +1,9 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, Response
 from datetime import datetime
 import random
 import sqlite3
-
+import csv
+import io
 app = Flask(__name__)
 
 DATABASE = "lighting.db"
@@ -191,7 +192,50 @@ def history():
         dict(row) for row in reversed(rows)
     ])
 
+@app.route("/api/export")
+def export_measurements():
+    connection = get_database()
 
+    rows = connection.execute(
+        """
+        SELECT measured_at, voltage, current, power, lighting_on
+        FROM measurements
+        ORDER BY id
+        """
+    ).fetchall()
+
+    connection.close()
+
+    output = io.StringIO()
+    output.write("\ufeff")
+
+    writer = csv.writer(output)
+
+    writer.writerow([
+        "Дата и время",
+        "Напряжение, В",
+        "Ток, А",
+        "Мощность, Вт",
+        "Освещение включено"
+    ])
+
+    for row in rows:
+        writer.writerow([
+            row["measured_at"],
+            row["voltage"],
+            row["current"],
+            row["power"],
+            "Да" if row["lighting_on"] else "Нет"
+        ])
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={
+            "Content-Disposition":
+                "attachment; filename=lighting_measurements.csv"
+        }
+    )
 create_database()
 
 
