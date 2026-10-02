@@ -41,6 +41,7 @@ async function turnLight(action) {
         });
 
         await updateData();
+        addEvent(action);
     } catch (error) {
         alert("Не удалось выполнить команду");
     }
@@ -125,7 +126,41 @@ function drawPowerChart() {
     );
 }
 
+function addEvent(action) {
+    const eventLog = document.getElementById("eventLog");
+    const time = new Date().toLocaleTimeString("ru-RU");
 
+    const initialRow = eventLog.querySelector("tr");
+
+    if (
+        initialRow &&
+        initialRow.textContent.includes("Система запущена")
+    ) {
+        initialRow.remove();
+    }
+
+    const row = document.createElement("tr");
+
+    if (action === "on") {
+        row.innerHTML = `
+            <td>${time}</td>
+            <td>Команда включения</td>
+            <td class="event-on">Включено</td>
+        `;
+    } else {
+        row.innerHTML = `
+            <td>${time}</td>
+            <td>Команда выключения</td>
+            <td class="event-off">Выключено</td>
+        `;
+    }
+
+    eventLog.prepend(row);
+
+    while (eventLog.rows.length > 10) {
+        eventLog.deleteRow(10);
+    }
+}
 updateData();
 
 setInterval(updateData, 2000);
