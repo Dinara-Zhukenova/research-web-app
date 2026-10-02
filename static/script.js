@@ -1,5 +1,22 @@
 const powerHistory = [];
+async function loadHistory() {
+    try {
+        const response = await fetch("/api/history");
+        const history = await response.json();
 
+        powerHistory.length = 0;
+
+        history.forEach((measurement) => {
+            powerHistory.push(measurement.power);
+        });
+
+        drawPowerChart();
+    } catch (error) {
+        console.error("Не удалось загрузить историю", error);
+    }
+
+    await updateData();
+}
 
 async function updateData() {
     try {
@@ -161,6 +178,6 @@ function addEvent(action) {
         eventLog.deleteRow(10);
     }
 }
-updateData();
+loadHistory();
 
 setInterval(updateData, 2000);
