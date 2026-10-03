@@ -44,6 +44,19 @@ async function updateData() {
         document.getElementById("dataSource").textContent =
             data.data_source === "mqtt" ? "MQTT" : "Симуляция";
 
+        const deviceStatus = document.getElementById("deviceStatus");
+        const lastMessage = document.getElementById("lastMessage");
+        if (data.device_online) {
+            deviceStatus.textContent = "В сети";
+            deviceStatus.className = "value status status-on";
+        } else {
+            deviceStatus.textContent = "Нет связи";
+            deviceStatus.className = "value status status-off";
+        }
+        lastMessage.textContent = data.last_message_seconds === null
+            ? "нет данных"
+            : `${data.last_message_seconds} с назад`;
+
         const status = document.getElementById("status");
         const mode = document.getElementById("controlMode");
         if (data.lighting_on) {

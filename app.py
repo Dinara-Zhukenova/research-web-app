@@ -188,6 +188,10 @@ def get_data():
         "control_mode": control_mode,
         "savings": savings,
         "data_source": data_source,
+        "device_online": mqtt_age is not None and mqtt_age < 15,
+        "last_message_seconds": (
+            round(mqtt_age, 1) if mqtt_age is not None else None
+        ),
     })
 
 
