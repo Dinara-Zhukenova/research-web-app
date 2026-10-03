@@ -57,6 +57,21 @@ async function updateData() {
             ? "нет данных"
             : `${data.last_message_seconds} с назад`;
 
+        const alertStatus = document.getElementById("alertStatus");
+        if (!data.device_online) {
+            alertStatus.textContent = "Авария: нет связи";
+            alertStatus.className = "value status status-off";
+        } else if (data.voltage < 205 || data.voltage > 240) {
+            alertStatus.textContent = "Авария напряжения";
+            alertStatus.className = "value status status-off";
+        } else if (data.current > 4) {
+            alertStatus.textContent = "Перегрузка по току";
+            alertStatus.className = "value status status-off";
+        } else {
+            alertStatus.textContent = "Система в норме";
+            alertStatus.className = "value status status-on";
+        }
+
         const status = document.getElementById("status");
         const mode = document.getElementById("controlMode");
         if (data.lighting_on) {
