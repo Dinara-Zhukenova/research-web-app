@@ -1,5 +1,5 @@
 from csv import writer
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from io import StringIO
 import json
 import os
@@ -18,6 +18,7 @@ DATABASE = "lighting.db"
 MQTT_HOST = os.getenv("MQTT_HOST", "mqtt")
 MQTT_PORT = int(os.getenv("MQTT_PORT", "1883"))
 MQTT_TOPIC = "lighting/sensor/data"
+ORAL_TIMEZONE = timezone(timedelta(hours=5))
 
 lighting_on = True
 control_mode = "conventional"
@@ -25,6 +26,10 @@ latest_mqtt_data = None
 latest_mqtt_time = 0
 mqtt_lock = threading.Lock()
 mqtt_client = None
+
+
+def current_time():
+    return datetime.now(ORAL_TIMEZONE).isoformat(timespec="seconds")
 
 
 def get_database():
@@ -64,6 +69,23 @@ def create_database():
             lighting_on INTEGER NOT NULL
         )
     """)
+    existing_columns = {
+        row[1]
+        for row in connection.execute(
+            "PRAGMA table_info(research_measurements)"
+        ).fetchall()
+    }
+    new_columns = {
+        "lux": "REAL NOT NULL DEFAULT 0",
+        "data_source": "TEXT NOT NULL DEFAULT 'simulation'",
+        "device_online": "INTEGER NOT NULL DEFAULT 0",
+    }
+    for column_name, column_type in new_columns.items():
+        if column_name not in existing_columns:
+            connection.execute(
+                f"ALTER TABLE research_measurements "
+                f"ADD COLUMN {column_name} {column_type}"
+            )
     connection.commit()
     connection.close()
 
@@ -75,7 +97,7 @@ def save_event(event_type):
         INSERT INTO events (created_at, event_type, lighting_on)
         VALUES (?, ?, ?)
         """,
-        (datetime.now().isoformat(timespec="seconds"), event_type, int(lighting_on)),
+        (current_time(), event_type, int(lighting_on)),
     )
     connection.commit()
     connection.close()
@@ -90,7 +112,7 @@ def on_connect(client, userdata, flags, reason_code, properties):
 
 
 def on_message(client, userdata, message):
-    global latest_mqtt_data, latest_mqtt_time
+    global latest_mqtt_data, latest_mqtt_time, lighting_on, control_mode
     try:
         payload = json.loads(message.payload.decode("utf-8"))
         data = {
@@ -102,6 +124,11 @@ def on_message(client, userdata, message):
         with mqtt_lock:
             latest_mqtt_data = data
             latest_mqtt_time = time.time()
+            if "lighting_on" in payload:
+                lighting_on = bool(payload["lighting_on"])
+            reported_mode = payload.get("control_mode")
+            if reported_mode in ("conventional", "adaptive"):
+                control_mode = reported_mode
         print(f"MQTT data received: {data}", flush=True)
     except (ValueError, TypeError, KeyError, json.JSONDecodeError) as error:
         print(f"Invalid MQTT message: {error}", flush=True)
@@ -157,7 +184,8 @@ def get_data():
     if lighting_on and control_mode == "adaptive" and conventional_power > 0:
         savings = round((conventional_power - power) / conventional_power * 100, 1)
 
-    measured_at = datetime.now().isoformat(timespec="seconds")
+    measured_at = current_time()
+    device_online = mqtt_age is not None and mqtt_age < 15
     connection = get_database()
     connection.execute(
         """
@@ -170,10 +198,14 @@ def get_data():
     connection.execute(
         """
         INSERT INTO research_measurements
-        (measured_at, control_mode, voltage, current, power, lighting_on)
-        VALUES (?, ?, ?, ?, ?, ?)
+        (measured_at, control_mode, voltage, current, power, lighting_on,
+         lux, data_source, device_online)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
-        (measured_at, control_mode, voltage, current, power, int(lighting_on)),
+        (
+            measured_at, control_mode, voltage, current, power,
+            int(lighting_on), lux, data_source, int(device_online),
+        ),
     )
     connection.commit()
     connection.close()
@@ -188,7 +220,7 @@ def get_data():
         "control_mode": control_mode,
         "savings": savings,
         "data_source": data_source,
-        "device_online": mqtt_age is not None and mqtt_age < 15,
+        "device_online": device_online,
         "last_message_seconds": (
             round(mqtt_age, 1) if mqtt_age is not None else None
         ),
@@ -277,7 +309,8 @@ def export_measurements():
     connection = get_database()
     rows = connection.execute(
         """
-        SELECT measured_at, control_mode, voltage, current, power, lighting_on
+        SELECT measured_at, control_mode, voltage, current, power,
+               lighting_on, lux, data_source, device_online
         FROM research_measurements ORDER BY id
         """
     ).fetchall()
@@ -287,7 +320,8 @@ def export_measurements():
     csv_writer = writer(output)
     csv_writer.writerow([
         "Дата и время", "Режим", "Напряжение, В", "Ток, А",
-        "Мощность, Вт", "Освещение включено",
+        "Мощность, Вт", "Освещённость, лк", "Источник данных",
+        "ESP32-S3 в сети", "Освещение включено",
     ])
     for row in rows:
         mode_name = (
@@ -297,7 +331,9 @@ def export_measurements():
         )
         csv_writer.writerow([
             row["measured_at"], mode_name, row["voltage"], row["current"],
-            row["power"], "Да" if row["lighting_on"] else "Нет",
+            row["power"], row["lux"], row["data_source"],
+            "Да" if row["device_online"] else "Нет",
+            "Да" if row["lighting_on"] else "Нет",
         ])
     return Response(
         output.getvalue(),
