@@ -24,6 +24,7 @@ control_mode = "conventional"
 latest_mqtt_data = None
 latest_mqtt_time = 0
 mqtt_lock = threading.Lock()
+mqtt_client = None
 
 
 def get_database():
@@ -115,6 +116,11 @@ def start_mqtt():
     return client
 
 
+def publish_mqtt_command(topic, value):
+    if mqtt_client is not None:
+        mqtt_client.publish(topic, value, qos=1, retain=True)
+
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -189,6 +195,7 @@ def get_data():
 def turn_on():
     global lighting_on
     lighting_on = True
+    publish_mqtt_command("lighting/control/light", "on")
     save_event("Команда включения")
     return jsonify({"lighting_on": lighting_on})
 
@@ -197,6 +204,7 @@ def turn_on():
 def turn_off():
     global lighting_on
     lighting_on = False
+    publish_mqtt_command("lighting/control/light", "off")
     save_event("Команда выключения")
     return jsonify({"lighting_on": lighting_on})
 
@@ -207,6 +215,7 @@ def change_mode(mode):
     if mode not in ("conventional", "adaptive"):
         return jsonify({"error": "Неизвестный режим"}), 400
     control_mode = mode
+    publish_mqtt_command("lighting/control/mode", mode)
     if mode == "adaptive":
         save_event("Включён адаптивный IoT-режим")
     else:
